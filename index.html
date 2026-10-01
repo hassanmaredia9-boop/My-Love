@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Our Story, My Forever 💕</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Inter:wght@300;400;500&display=swap"
+  rel="stylesheet"
+/>
+
+<!-- Tailwind CSS via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cream: "#FBF6F0",
+          charcoal: "#1A1517",
+          rose: {
+            200: "#FECDD3",
+            300: "#FDA4AF",
+            400: "#FB7185",
+            500: "#E88B9A",
+            600: "#C25A6E",
+            700: "#9E3D52",
+          },
+          gold: {
+            300: "#E8C9A0",
+            400: "#D4A574",
+            500: "#B8875A",
+          },
+        },
+        fontFamily: {
+          serif: ["'Cormorant Garamond'", "serif"],
+          sans: ["'Inter'", "sans-serif"],
+          script: ["'Dancing Script'", "cursive"],
+        },
+        animation: {
+          "pulse-heart": "pulseHeart 1.6s ease-in-out infinite",
+          glow: "glow 4s ease-in-out infinite",
+        },
+        keyframes: {
+          pulseHeart: {
+            "0%, 100%": { transform: "scale(1)" },
+            "25%": { transform: "scale(1.15)" },
+            "50%": { transform: "scale(1)" },
+            "75%": { transform: "scale(1.1)" },
+          },
+          glow: {
+            "0%, 100%": { opacity: 0.4 },
+            "50%": { opacity: 0.9 },
+          },
+        },
+      },
+    },
+  };
+</script>
+
+<!-- React + ReactDOM + Babel + Lucide + Confetti via CDN -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: #1A1517;
+    color: #FBF6F0;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #1A1517; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #C25A6E, #9E3D52);
+    border-radius: 4px;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, #E8C9A0 0%, #FB7185 50%, #C25A6E 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .glow-orb { filter: blur(80px); opacity: 0.5; }
+  .timeline-glow { box-shadow: 0 0 20px rgba(194, 90, 110, 0.6); }
+  .card-lift {
+    transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease;
+  }
+  .card-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px -20px rgba(194, 90, 110, 0.5);
+  }
+  .reveal, .reveal-left, .reveal-right, .reveal-scale {
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.22,1,0.36,1), transform 1.2s cubic-bezier(0.22,1,0.36,1);
+    will-change: opacity, transform;
+  }
+  .reveal { transform: translateY(50px); }
+  .reveal-left { transform: translateX(-60px); }
+  .reveal-right { transform: translateX(60px); }
+  .reveal-scale { transform: scale(0.85); }
+  .reveal.active, .reveal-left.active, .reveal-right.active, .reveal-scale.active {
+    opacity: 1;
+    transform: translate(0) scale(1);
+  }
+  .perspective-1000 { perspective: 1000px; }
+  .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .shimmer-border { position: relative; overflow: hidden; }
+  .shimmer-border::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(232,201,160,0.2), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes kenburns {
+    0%   { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.15) translate(-2%, -1%); }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef } = React;
+
+/* ============ ICONS (SVG components mimicking Lucide) ============ */
+const Icon = ({ path, className = "w-5 h-5", fill = "none", stroke = "currentColor" }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill={fill}
+    stroke={stroke}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    {path}
+  </svg>
+);
+
+const Heart = ({ className = "w-5 h-5", fill = "none" }) => (
+  <Icon className={className} fill={fill} path={
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  } />
+);
+const ChevronDown = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={<polyline points="6 9 12 15 18 9" />} />
+);
+const Sparkles = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={
+    <>
+      <path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2L12 3z" />
+      <path d="M5 3v4" /><path d="M19 17v4" />
+      <path d="M3 5h4" /><path d="M17 19h4" />
+    </>
+  } />
+);
+const Sparkle = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={
+    <path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2L12 3z" />
+  } />
+);
+const Music = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={
+    <>
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
+    </>
+  } />
+);
+const Play = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={<polygon points="5 3 19 12 5 21 5 3" />} />
+);
+const Pause = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={
+    <>
+      <rect x="6" y="4" width="4" height="16" />
+      <rect x="14" y="4" width="4" height="16" />
+    </>
+  } />
+);
+const Plane = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={<path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />} />
+);
+const HomeIcon = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={
+    <>
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </>
+  } />
+);
+const InfinityIcon = ({ className = "w-5 h-5" }) => (
+  <Icon className={className} path={
+    <path d="M18.178 8c-2.586 0-4.558 2.5-6.178 5-1.62 2.5-3.592 5-6.178 5A3.822 3.822 0 0 1 2 14.178 3.822 3.822 0 0 1 5.822 10.4c2.586 0 4.558 2.5 6.178 5 1.62 2.5 3.592 5 6.178 5A3.822 3.822 0 0 0 22 16.578 3.822 3.822 0 0 0 18.178 12.8" />
+  } />
+);
+
+/* ============ SCROLL REVEAL HOOK ============ */
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll(
+      ".reveal, .reveal-left, .reveal-right, .reveal-scale"
+    );
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("active");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+}
+
+/* ============ FLOATING PARTICLES ============ */
+function FloatingParticles() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let raf;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const make = () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 2 + 0.5,
+      sy: -(Math.random() * 0.4 + 0.15),
+      sx: (Math.random() - 0.5) * 0.3,
+      o: Math.random() * 0.5 + 0.2,
+      hue: Math.random() > 0.5 ? 340 : 30,
+    });
+
+    for (let i = 0; i < 60; i++) particles.push(make());
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, i) => {
+        p.y += p.sy;
+        p.x += p.sx;
+        if (p.y < -10) {
+          particles[i] = make();
+          particles[i].y = canvas.height + 10;
+        }
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        g.addColorStop(0, `hsla(${p.hue}, 70%, 75%, ${p.o})`);
+        g.addColorStop(1, `hsla(${p.hue}, 70%, 60%, 0)`);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+      });
+      raf = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <>
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-rose-600/30 glow-orb animate-glow" />
+        <div className="absolute top-2/3 -right-20 w-96 h-96 rounded-full bg-gold-400/20 glow-orb animate-glow" style={{ animationDelay: "2s" }} />
+        <div className="absolute bottom-0 left-1/3 w-80 h-80 rounded-full bg-rose-400/20 glow-orb animate-glow" style={{ animationDelay: "1s" }} />
+      </div>
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[1]" />
+    </>
+  );
+}
+
+/* ============ HERO ============ */
+function Hero() {
+  const scrollNext = () => {
+    document.getElementById("timeline")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <section className="relative min-h-screen flex items-center justify-center px-6 sm:px-10 lg:px-16 py-24 overflow-hidden">
+      <div className="relative z-10 w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="text-center lg:text-left order-2 lg:order-1">
+          <p className="reveal text-gold-300 tracking-[0.4em] uppercase text-xs sm:text-sm mb-6">
+            A Love Letter Written in Time
+          </p>
+
+          <h2 className="reveal font-script text-4xl sm:text-5xl md:text-6xl text-rose-400 mb-3">
+            For My Dearest
+          </h2>
+
+          <h1 className="reveal font-serif italic text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-cream leading-[0.95] mb-6">
+            Our Story,<br />
+            <span className="gradient-text">My Forever</span>
+          </h1>
+
+          <p className="reveal max-w-xl mx-auto lg:mx-0 text-cream/70 text-base sm:text-lg leading-relaxed mb-8">
+            Every heartbeat has been writing this story since the day we met.
+            Scroll gently — this one is for you.
+          </p>
+
+          <button
+            onClick={scrollNext}
+            className="reveal group inline-flex items-center gap-3 px-8 py-4 rounded-full border border-rose-400/40 bg-rose-500/10 backdrop-blur-sm text-rose-200 tracking-wider uppercase text-xs sm:text-sm hover:bg-rose-500/20 hover:border-rose-400 hover:shadow-[0_0_40px_-5px_rgba(251,113,133,0.6)] transition-all duration-500"
+          >
+            <Heart className="w-4 h-4 animate-pulse-heart fill-rose-400 text-rose-400" />
+            Begin Our Journey
+          </button>
+        </div>
+
+        <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
+          <div className="reveal-scale relative w-full max-w-[340px] sm:max-w-[380px] lg:max-w-[420px]">
+            <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-rose-500/40 via-gold-400/20 to-rose-700/40 blur-2xl opacity-70 animate-glow" />
+
+            <div className="relative aspect-[9/16] rounded-[2rem] overflow-hidden border border-rose-400/30 shadow-[0_30px_80px_-20px_rgba(194,90,110,0.7)] group">
+              <img
+                src="image\Snapchat-1558924025.jpg"
+                alt="My Love"
+                className="w-full h-full object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-105"
+              />
+
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent pointer-events-none" />
+
+              <div className="absolute bottom-5 right-5 w-12 h-12 rounded-full bg-charcoal/70 backdrop-blur-md border border-rose-400/40 flex items-center justify-center">
+                <Heart className="w-5 h-5 fill-rose-400 text-rose-400 animate-pulse-heart" />
+              </div>
+            </div>
+
+            <div className="absolute -top-3 -left-3 w-16 h-16 border-t-2 border-l-2 border-gold-400/40 rounded-tl-[2rem]" />
+            <div className="absolute -bottom-3 -right-3 w-16 h-16 border-b-2 border-r-2 border-rose-400/40 rounded-br-[2rem]" />
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-rose-300/60 z-10">
+        <span className="text-[10px] tracking-[0.3em] uppercase">Scroll</span>
+        <ChevronDown className="w-5 h-5 animate-bounce" />
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-charcoal to-transparent pointer-events-none" />
+    </section>
+  );
+}
+
+/* ============ TIMELINE ============ */
+const milestones = [
+  { date: "The Day We Met", title: "Where It All Began", desc: "The universe conspired, the timing aligned, and suddenly there you were — and everything made sense.", img: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&auto=format&fit=crop" },
+  { date: "Our First Date", title: "Nervous Hearts, Endless Laughter", desc: "Hours felt like minutes. I drove home smiling, already knowing you were the one.", img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&auto=format&fit=crop" },
+  { date: "Our Adventures", title: "Everywhere With You Feels Like Home", desc: "Sunsets, road trips, late-night talks — you turned ordinary days into forever memories.", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop" },
+  { date: "The Moment I Knew", title: "You Were Always My Forever", desc: "In a quiet moment, watching you laugh, I realized — I want to spend every lifetime with you.", img: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?w=800&auto=format&fit=crop" },
+];
+
+function Timeline() {
+  return (
+    <section id="timeline" className="relative py-32 px-6">
+      <div className="max-w-3xl mx-auto text-center mb-20">
+        <div className="reveal flex items-center justify-center gap-3 mb-4">
+          <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold-400" />
+          <Sparkles className="w-4 h-4 text-gold-400" />
+          <div className="h-px w-12 bg-gradient-to-l from-transparent to-gold-400" />
+        </div>
+        <h2 className="reveal font-serif italic text-4xl sm:text-5xl md:text-6xl text-cream mb-4">
+          How We Met & <span className="gradient-text">Our Journey</span>
+        </h2>
+        <p className="reveal text-cream/60 max-w-xl mx-auto">
+          A few of the countless moments that made me certain.
+        </p>
+      </div>
+      <div className="relative max-w-4xl mx-auto">
+        <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-rose-500/60 to-transparent timeline-glow hidden md:block" />
+        <div className="space-y-20 md:space-y-32">
+          {milestones.map((m, i) => {
+            const isLeft = i % 2 === 0;
+            return (
+              <div key={i} className={`relative flex flex-col md:flex-row items-center gap-8 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
+                <div className={`w-full md:w-1/2 ${isLeft ? "reveal-left md:pr-16 md:text-right" : "reveal-right md:pl-16"}`}>
+                  <p className="text-gold-300 text-xs tracking-[0.3em] uppercase mb-3">{m.date}</p>
+                  <h3 className="font-serif italic text-2xl sm:text-3xl text-rose-200 mb-4">{m.title}</h3>
+                  <p className="text-cream/70 leading-relaxed">{m.desc}</p>
+                </div>
+                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-charcoal border-2 border-rose-500 items-center justify-center z-10 shadow-[0_0_30px_rgba(194,90,110,0.8)]">
+                  <Heart className="w-5 h-5 fill-rose-400 text-rose-400" />
+                </div>
+                <div className={`w-full md:w-1/2 ${isLeft ? "reveal-right md:pl-16" : "reveal-left md:pr-16"}`}>
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-rose-500/20 bg-gradient-to-br from-rose-600/20 to-gold-400/10 backdrop-blur-sm card-lift group">
+                    <img src={m.img} alt={m.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ REASONS ============ */
+const reasons = [
+  { icon: "✨", text: "The way your eyes light up when you smile." },
+  { icon: "🌸", text: "How you make ordinary days feel magical." },
+  { icon: "💫", text: "Your kindness that touches everyone around you." },
+  { icon: "🎶", text: "The sound of your laughter — my favorite song." },
+  { icon: "♾️", text: "How you make me want to be a better person." },
+  { icon: "🌙", text: "The way you say my name when it's just us." },
+  { icon: "🔥", text: "Your fire and passion for everything you love." },
+  { icon: "🤍", text: "How safe I feel when you hold my hand." },
+  { icon: "🌹", text: "Your grace, even on the hardest days." },
+  { icon: "💍", text: "Because forever still doesn't feel long enough." },
+];
+
+function ReasonCard({ icon, text, index }) {
+  const [flipped, setFlipped] = useState(false);
+  return (
+    <button
+      onClick={() => setFlipped(!flipped)}
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      className="reveal-scale group relative aspect-square w-full perspective-1000"
+      style={{ transitionDelay: `${index * 80}ms` }}
+    >
+      <div className={`relative w-full h-full transition-transform duration-700 preserve-3d ${flipped ? "[transform:rotateY(180deg)]" : ""}`}>
+        <div className="absolute inset-0 rounded-2xl border border-rose-500/20 bg-gradient-to-br from-[#231a1d] to-[#1A1517] flex flex-col items-center justify-center p-6 backface-hidden card-lift">
+          <Sparkle className="w-6 h-6 text-gold-400 mb-3 opacity-70" />
+          <p className="text-cream/50 text-xs tracking-widest uppercase">Reason #{index + 1}</p>
+          <p className="text-cream/30 text-[10px] mt-4">Tap to reveal</p>
+        </div>
+        <div className="absolute inset-0 rounded-2xl border border-gold-400/30 bg-gradient-to-br from-rose-700/40 via-rose-600/20 to-[#2A1F24] p-6 flex flex-col items-center justify-center text-center [transform:rotateY(180deg)] backface-hidden shadow-[0_0_40px_-10px_rgba(232,201,160,0.4)]">
+          <span className="text-3xl mb-3">{icon}</span>
+          <p className="font-serif italic text-cream text-sm sm:text-base leading-snug">{text}</p>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function Reasons() {
+  return (
+    <section className="relative py-32 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-20">
+          <div className="reveal flex items-center justify-center gap-3 mb-4">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-rose-400" />
+            <Heart className="w-4 h-4 text-rose-400 fill-rose-400" />
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-rose-400" />
+          </div>
+          <h2 className="reveal font-serif italic text-4xl sm:text-5xl md:text-6xl text-cream mb-4">
+            Reasons Why <span className="gradient-text">I Love You</span>
+          </h2>
+          <p className="reveal text-cream/60 max-w-xl mx-auto">
+            Ten of a thousand. Tap each card to reveal a reason.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+          {reasons.map((r, i) => (
+            <ReasonCard key={i} icon={r.icon} text={r.text} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ SOUNDTRACK ============ */
+function Soundtrack() {
+  const audioRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const togglePlay = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (playing) a.pause(); else a.play().catch(() => {});
+    setPlaying(!playing);
+  };
+
+  const onTime = () => {
+    const a = audioRef.current;
+    if (a && a.duration) setProgress((a.currentTime / a.duration) * 100);
+  };
+
+  const seek = (e) => {
+    const a = audioRef.current;
+    if (!a || !a.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    a.currentTime = ((e.clientX - rect.left) / rect.width) * a.duration;
+  };
+
+  return (
+    <section className="relative py-32 px-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-16">
+          <div className="reveal flex items-center justify-center gap-3 mb-4">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold-400" />
+            <Music className="w-4 h-4 text-gold-400" />
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-gold-400" />
+          </div>
+          <h2 className="reveal font-serif italic text-4xl sm:text-5xl md:text-6xl text-cream mb-4">
+            Our <span className="gradient-text">Soundtrack</span>
+          </h2>
+          <p className="reveal text-cream/60">The song that plays every time I think of you.</p>
+        </div>
+        <div className="reveal-scale relative rounded-3xl border border-rose-500/20 bg-gradient-to-br from-[#231a1d]/90 to-[#1A1517]/90 backdrop-blur-xl p-8 sm:p-10 shadow-[0_30px_80px_-20px_rgba(194,90,110,0.4)] shimmer-border">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden flex-shrink-0 border border-rose-500/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-600 to-gold-500" />
+              <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&auto=format&fit=crop" alt="Our song" className="relative w-full h-full object-cover mix-blend-overlay opacity-70" />
+              <Heart className="absolute inset-0 m-auto w-8 h-8 fill-white/90 text-white/90 animate-pulse-heart" />
+            </div>
+            <div className="flex-1 min-w-0 w-full">
+              <p className="text-gold-300 text-[10px] sm:text-xs tracking-[0.3em] uppercase mb-1">Our Song</p>
+              <h3 className="font-serif italic text-xl sm:text-2xl text-cream truncate">Ishq Mubarak — Arijit Singh</h3>
+              <p className="text-cream/50 text-xs sm:text-sm mt-1 truncate">The night we danced to this, I knew.</p>
+              <div onClick={seek} className="mt-4 h-1.5 rounded-full bg-cream/10 cursor-pointer overflow-hidden group">
+                <div className="h-full bg-gradient-to-r from-rose-400 to-gold-400 transition-[width] duration-200" style={{ width: `${progress}%` }} />
+              </div>
+              <button onClick={togglePlay} className="mt-5 group flex items-center gap-3 px-6 py-3 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-100 hover:bg-rose-500/30 hover:shadow-[0_0_30px_-5px_rgba(251,113,133,0.7)] transition-all duration-300">
+                {playing ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
+                <span className="text-xs tracking-widest uppercase">{playing ? "Pause" : "Play Our Song"}</span>
+              </button>
+            </div>
+          </div>
+          <p className="reveal mt-8 pt-6 border-t border-cream/10 text-cream/70 italic font-serif text-base sm:text-lg leading-relaxed">
+            "Every lyric reminds me of us. From the first note to the last, this song is the sound of my heart choosing you — again and again, without hesitation."
+          </p>
+          <audio ref={audioRef} src="song/ISHQ MUBARAK Full Video Song Tum Bin 2 Arijit Singh Neha Sharma, Aditya Seal & Aashim Gulati.mp3" onTimeUpdate={onTime} onEnded={() => setPlaying(false)} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ FINALE ============ */
+const dreams = [
+  { icon: Plane, title: "Travel the World", text: "Passport in hand, your hand in mine." },
+  { icon: HomeIcon, title: "Build Our Home", text: "A little place filled with laughter and love." },
+  { icon: Sparkles, title: "Grow Together", text: "Chasing dreams, side by side, always." },
+  { icon: InfinityIcon, title: "Forever & Always", text: "Every version of you, every version of us." },
+];
+
+function Finale() {
+  const [answered, setAnswered] = useState(false);
+
+  const celebrate = () => {
+    setAnswered(true);
+    const colors = ["#FB7185", "#E8C9A0", "#C25A6E", "#FFF1F2"];
+    const end = Date.now() + 4000;
+
+    (function frame() {
+      confetti({ particleCount: 3, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors, shapes: ["circle"], scalar: 1.2 });
+      confetti({ particleCount: 3, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors, shapes: ["circle"], scalar: 1.2 });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    })();
+
+    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors, scalar: 1.3 });
+  };
+
+  return (
+    <section className="relative py-32 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-20">
+          <div className="reveal flex items-center justify-center gap-3 mb-4">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-rose-400" />
+            <Heart className="w-4 h-4 text-rose-400 fill-rose-400" />
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-rose-400" />
+          </div>
+          <h2 className="reveal font-serif italic text-4xl sm:text-5xl md:text-6xl text-cream mb-4">
+            The Future <span className="gradient-text">We Build Together</span>
+          </h2>
+          <p className="reveal text-cream/60 max-w-xl mx-auto">
+            Every tomorrow I imagine begins and ends with you.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-20">
+          {dreams.map((d, i) => {
+            const I = d.icon;
+            return (
+              <div key={i} className="reveal-scale rounded-2xl border border-rose-500/20 bg-gradient-to-br from-[#231a1d] to-[#1A1517] p-8 card-lift group" style={{ transitionDelay: `${i * 120}ms` }}>
+                <I className="w-8 h-8 text-gold-400 mb-4 group-hover:scale-110 transition-transform duration-500" />
+                <h3 className="font-serif italic text-2xl text-rose-200 mb-2">{d.title}</h3>
+                <p className="text-cream/60">{d.text}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="reveal-scale relative rounded-3xl border border-gold-400/30 bg-gradient-to-br from-rose-700/30 via-[#2A1F24] to-[#1A1517] p-10 sm:p-16 text-center shadow-[0_40px_100px_-30px_rgba(232,201,160,0.4)] overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-rose-500/30 glow-orb" />
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-gold-400/20 glow-orb" />
+          <div className="relative z-10">
+            <p className="text-gold-300 tracking-[0.3em] uppercase text-xs mb-6">One Last Question</p>
+            <h3 className="font-serif italic text-4xl sm:text-5xl md:text-6xl text-cream mb-6 leading-tight">
+              Will You Marry Me,<br /><span className="gradient-text">My Forever?</span>
+            </h3>
+            <p className="text-cream/70 max-w-lg mx-auto mb-10 text-base sm:text-lg leading-relaxed">
+              I've already chosen you a thousand times over. All I need now is your yes — and I promise to spend a lifetime earning it.
+            </p>
+            {!answered ? (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onClick={celebrate} className="w-full sm:w-auto px-10 py-4 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 text-white tracking-widest uppercase text-sm font-medium hover:shadow-[0_0_50px_-5px_rgba(251,113,133,0.9)] hover:scale-105 transition-all duration-300">
+                  Yes 💍
+                </button>
+                <button onClick={celebrate} className="w-full sm:w-auto px-10 py-4 rounded-full border border-gold-400/50 text-gold-300 tracking-widest uppercase text-sm font-medium hover:bg-gold-400/10 hover:shadow-[0_0_40px_-5px_rgba(232,201,160,0.7)] hover:scale-105 transition-all duration-300">
+                  Yes, A Million Times ✨
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="text-6xl mb-6">💖</div>
+                <p className="font-script text-3xl sm:text-4xl text-rose-300 mb-3">She said yes!</p>
+                <p className="text-cream/70 italic font-serif text-lg">Forever begins now. I love you, always.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ APP ============ */
+function App() {
+  useScrollReveal();
+  return (
+    <div className="relative min-h-screen bg-charcoal overflow-x-hidden">
+      <FloatingParticles />
+      <main className="relative z-10">
+        <Hero />
+        <Timeline />
+        <Reasons />
+        <Soundtrack />
+        <Finale />
+      </main>
+      <footer className="text-center py-10 text-cream/40 text-sm relative z-10">
+        Made with <span className="text-rose-400">❤️</span> for my forever.
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
